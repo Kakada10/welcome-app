@@ -22,7 +22,7 @@ pipeline {
         }
         stage('Checkout from Git') {
             steps {
-                git branch: 'main', url: 'https://github.com/Kakada10/a-reddit-clone.git'
+                git branch: 'prod', url: 'https://github.com/Kakada10/welcome-app'
             }
         }
         stage("Sonarqube Analysis") {
@@ -66,7 +66,7 @@ pipeline {
         stage("Trivy Image Scan") {
              steps {
                  script {
-	              sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image capybara22/reddit-clone-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table > trivyimage.txt')
+	              sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image capybara22/welcome-app:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table > trivyimage.txt')
                  }
              }
         }
@@ -81,7 +81,7 @@ pipeline {
 	stage("Trigger CD Pipeline") {
             steps {
                 script {
-                    sh "curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'ec2-13-212-101-35.ap-southeast-1.compute.amazonaws.com:8080/job/Reddit-Clone-CD/buildWithParameters?token=gitops-token'"
+                    sh "curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'ec2-13-212-101-35.ap-southeast-1.compute.amazonaws.com:8080/job/Welcome-App-CD/buildWithParameters?token=gitops-token'"
                 }
             }
         }
