@@ -7,7 +7,7 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
         APP_NAME = "welcome-app"
-        RELEASE = "prod"
+        RELEASE = "dev"
         DOCKER_USER = "capybara22"
         DOCKER_PASS = 'dockerhub'
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
