@@ -12,7 +12,7 @@ pipeline {
         DOCKER_PASS = 'dockerhub'
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-	JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
+	
     }
     stages {
         stage('clean workspace') {
@@ -25,30 +25,10 @@ pipeline {
                 git branch: 'prod', url: 'https://github.com/Kakada10/welcome-app'
             }
         }
-        stage("Sonarqube Analysis") {
-            steps {
-                withSonarQubeEnv('SonarQube-Server') {
-                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Welcome-App-CI \
-                    -Dsonar.projectKey=Welcome-App-CI'''
-                }
-            }
-        }
-        stage("Quality Gate") {
-            steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'SonarQube-Token'
-                }
-            }
-        }
         stage('Install Dependencies') {
             steps {
                 sh "npm install"
             }
-        }
-        stage('TRIVY FS SCAN') {
-            steps {
-                sh "trivy fs . > trivyfs.txt"
-             }
         }
         stage("Build & Push Docker Image") {
              steps {
@@ -63,13 +43,6 @@ pipeline {
                  }
              }
         }
-        stage("Trivy Image Scan") {
-             steps {
-                 script {
-	              sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image capybara22/welcome-app:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table > trivyimage.txt')
-                 }
-             }
-        }
         stage ('Cleanup Artifacts') {
              steps {
                  script {
@@ -78,23 +51,5 @@ pipeline {
                  }
              }
         } 
-	stage("Trigger CD Pipeline") {
-            steps {
-                script {
-                    sh "curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'ec2-13-212-58-251.ap-southeast-1.compute.amazonaws.com:8080/job/Welcome-App-CD/buildWithParameters?token=gitops-token'"
-                }
-            }
-        }
-    }
-    post {
-        always {
-           emailext attachLog: true,
-               subject: "'${currentBuild.result}'",
-               body: "Project: ${env.JOB_NAME}<br/>" +
-                   "Build Number: ${env.BUILD_NUMBER}<br/>" +
-                   "URL: ${env.BUILD_URL}<br/>",
-               to: 'themiracleboy31@gmail.com',                              
-               attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
-        }
-     }		
+	
 }
