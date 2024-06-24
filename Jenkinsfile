@@ -5,7 +5,6 @@ pipeline {
         nodejs 'node16'
     }
     environment {
-        SCANNER_HOME = tool 'sonar-scanner'
         APP_NAME = "welcome-app"
         RELEASE = "qa"
         DOCKER_USER = "capybara22"
