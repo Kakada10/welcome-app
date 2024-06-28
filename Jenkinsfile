@@ -21,7 +21,7 @@ pipeline {
         }
         stage('Checkout from Git') {
             steps {
-                git branch: 'prod', url: 'https://github.com/Kakada10/welcome-app'
+                git branch: 'dev', url: 'https://github.com/Kakada10/welcome-app'
             }
         }
         stage('Install Dependencies') {
