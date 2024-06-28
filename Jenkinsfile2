@@ -7,11 +7,11 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
         APP_NAME = "welcome-app"
-        RELEASE = "dev"
+        ENVIRONMENT = "dev"
         DOCKER_USER = "capybara22"
         DOCKER_PASS = 'dockerhub'
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
-        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        IMAGE_TAG = "${ENVIRONMENT}-${BUILD_NUMBER}"
 	JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
     }
     stages {
@@ -22,7 +22,7 @@ pipeline {
         }
         stage('Checkout from Git') {
             steps {
-                git branch: 'prod', url: 'https://github.com/Kakada10/welcome-app'
+                git branch: 'dev', url: 'https://github.com/Kakada10/welcome-app'
             }
         }
         stage("Sonarqube Analysis") {
