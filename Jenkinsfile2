@@ -22,7 +22,7 @@ pipeline {
         }
         stage('Checkout from Git') {
             steps {
-                git branch: 'prod', url: 'https://github.com/Kakada10/welcome-app'
+                git branch: 'qa', url: 'https://github.com/Kakada10/welcome-app'
             }
         }
         stage("Sonarqube Analysis") {
